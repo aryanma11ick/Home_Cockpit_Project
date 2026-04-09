@@ -17,13 +17,13 @@ Currently, the project includes the development of:
 ---
 
 ## 🧱 Project Structure
-hardware/
-├── pcb/ # KiCad design files + Gerbers
-└── cad/ # STEP/STL files for panels and components
+hardware/  
+├── pcb/ # KiCad design files + Gerbers  
+└── cad/ # STEP/STL files for panels and components  
 
-firmware/ # Microcontroller code (Arduino / ESP32)
+firmware/ # Microcontroller code (Arduino / ESP32)  
 
-docs/ # Documentation, diagrams, and images
+docs/ # Documentation, diagrams, and images  
 
 
 ---
