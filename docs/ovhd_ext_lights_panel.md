@@ -24,6 +24,7 @@ https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/firmware/arduino/
 ### 🖼️ Panel Images
 
 https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_ext_lights_panel
+
 ---
 
 ## 📸 Hardware Preview
