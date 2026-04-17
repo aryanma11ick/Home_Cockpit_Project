@@ -28,8 +28,12 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 
 ```md
 ![Panel](docs/images/ovhd_ext_lights_panel/image_1.jpg)
+![Wiring](docs/images/ovhd_ext_lights_panel/image_1.jpg)
+![Panel](docs/images/ovhd_ext_lights_panel/image_2.jpg)
 ![Wiring](docs/images/ovhd_ext_lights_panel/image_2.jpg)
 ![Panel](docs/images/ovhd_ext_lights_panel/image_3.jpg)
+![Wiring](docs/images/ovhd_ext_lights_panel/image_3.jpg)
+![Panel](docs/images/ovhd_ext_lights_panel/image_4.jpg)
 ![Wiring](docs/images/ovhd_ext_lights_panel/image_4.jpg)
 ```
 
