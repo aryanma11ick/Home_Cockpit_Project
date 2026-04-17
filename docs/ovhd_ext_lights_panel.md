@@ -28,10 +28,16 @@ https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_
 ---
 
 ## 📸 Hardware Preview
-![](images/ovhd_ext_lights_panel/image_1.jpeg)
-![](images/ovhd_ext_lights_panel/image_2.jpeg)
-![](images/ovhd_ext_lights_panel/image_3.jpeg)
-![](images/ovhd_ext_lights_panel/image_4.jpeg)
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_1.jpeg" width="45%" />
+  <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_2.jpeg" width="45%" />
+</p>
+
+<p align="center">
+  <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_3.jpeg" width="45%" />
+  <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_4.jpeg" width="45%" />
+</p>
 ---
 
 ## 🚀 Features
