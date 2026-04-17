@@ -199,7 +199,3 @@ Aryan Mallick
 Home cockpit & avionics integration project
 
 ---
-
-## 📜 License
-
-MIT License (recommended)
