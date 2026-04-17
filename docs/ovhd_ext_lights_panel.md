@@ -30,13 +30,13 @@ https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_
 ## 📸 Hardware Preview
 
 <p float="left">
-  <img src="docs/images/ovhd_ext_lights_panel/image_1.jpg" width="45%" />
-  <img src="docs/images/ovhd_ext_lights_panel/image_2.jpg" width="45%" />
+  <img src="docs/images/ovhd_ext_lights_panel/image_1.jpeg" width="45%" />
+  <img src="docs/images/ovhd_ext_lights_panel/image_2.jpeg" width="45%" />
 </p>
 
 <p float="left">
-  <img src="docs/images/ovhd_ext_lights_panel/image_3.jpg" width="45%" />
-  <img src="docs/images/ovhd_ext_lights_panel/image_4.jpg" width="45%" />
+  <img src="docs/images/ovhd_ext_lights_panel/image_3.jpeg" width="45%" />
+  <img src="docs/images/ovhd_ext_lights_panel/image_4.jpeg" width="45%" />
 </p>
 
 ---
@@ -181,16 +181,16 @@ X-Plane 12/Resources/plugins/ArduinoSerialPlugin/64/win.xpl
 
 * RWY Turn-Off uses command-only logic (no feedback dataref)
 * Designed specifically for ToLiss Airbus aircraft
-* Initial alignment handled via dataref-based feedback loop
+* Uses animation datarefs for accurate state tracking
 
 ---
 
 ## 🔧 Future Improvements
 
-* LED feedback to Arduino (panel lighting sync)
+* LED feedback to Arduino
 * Auto serial reconnect
-* Cold & Dark / power state logic
-* Expansion to full overhead panel
+* Cold & Dark / power logic
+* Full overhead expansion
 
 ---
 
