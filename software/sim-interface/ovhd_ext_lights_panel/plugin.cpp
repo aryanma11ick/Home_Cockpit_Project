@@ -1,5 +1,5 @@
 // =============================================
-// TOLISS A320Neo LIGHT PANEL (FINAL - CLOSED LOOP)
+// TOLISS A320neo PANEL PLUGIN (FINAL - STABLE SAFE)
 // =============================================
 
 #include "XPLMPlugin.h"
@@ -11,13 +11,19 @@
 #include <string>
 
 // -------- CONFIG --------
-static constexpr const char* SERIAL_PORT = "COM7";
+static constexpr const char* PORT_LIGHTS = "COM7";
+static constexpr const char* PORT_ALERTS = "COM5";
 static constexpr DWORD BAUD_RATE = CBR_115200;
 
-// -------- GLOBALS --------
-static HANDLE hSerial = INVALID_HANDLE_VALUE;
+// -------- SERIAL --------
+static HANDLE hLights = INVALID_HANDLE_VALUE;
+static HANDLE hAlerts = INVALID_HANDLE_VALUE;
+
+static std::string bufLights;
+static std::string bufAlerts;
+
+// -------- LOOP --------
 static XPLMFlightLoopID loopID = nullptr;
-static std::string serialBuffer;
 
 // -------- COMMANDS --------
 static XPLMCommandRef S_up, S_dn;
@@ -30,67 +36,67 @@ static XPLMCommandRef B_on, B_off;
 static XPLMCommandRef W_on, W_off;
 static XPLMCommandRef R_on, R_off;
 
-// -------- DATAREFS (STATE) --------
-static XPLMDataRef dr_strobe;
-static XPLMDataRef dr_nav;
-static XPLMDataRef dr_LL;
-static XPLMDataRef dr_RL;
-static XPLMDataRef dr_nose;
-static XPLMDataRef dr_beacon;
-static XPLMDataRef dr_wing;
+static XPLMCommandRef cmd_warn;
+static XPLMCommandRef cmd_caut;
+static XPLMCommandRef cmd_chrono;
 
-// -------- TARGET STATES (from Arduino) --------
-static int tgtS = -1;
-static int tgtN = -1;
-static int tgtLL = -1;
-static int tgtRL = -1;
-static int tgtO = -1;
-static int tgtB = -1;
-static int tgtW = -1;
-static int tgtR = -1;
+// -------- DATAREFS --------
+static XPLMDataRef dr_strobe, dr_nav, dr_LL, dr_RL, dr_nose;
+static XPLMDataRef dr_beacon, dr_wing, dr_rwy;
+static XPLMDataRef dr_warn, dr_caut;
 
-// -----------------------------------------------
-// SERIAL SETUP
-// -----------------------------------------------
-static bool openSerial() {
+// -------- TARGET STATES --------
+static int tgtS = -1, tgtN = -1, tgtLL = -1, tgtRL = -1, tgtO = -1;
+static int tgtB = -1, tgtW = -1, tgtR = -1;
 
-    std::string port = "\\\\.\\" + std::string(SERIAL_PORT);
+// -------- TIMERS --------
+static float commandTimer = 0.0f;
+static float cdS = 0, cdN = 0, cdLL = 0, cdRL = 0, cdO = 0;
+static float cdB = 0, cdW = 0, cdR = 0;
 
-    hSerial = CreateFileA(port.c_str(),
+// -------- SERIAL OPEN --------
+bool openSerial(HANDLE& h, const char* port) {
+
+    std::string p = "\\\\.\\" + std::string(port);
+
+    h = CreateFileA(p.c_str(),
         GENERIC_READ | GENERIC_WRITE,
         0, NULL, OPEN_EXISTING,
         FILE_ATTRIBUTE_NORMAL, NULL);
 
-    if (hSerial == INVALID_HANDLE_VALUE) return false;
+    if (h == INVALID_HANDLE_VALUE) {
+        XPLMDebugString(("FAILED TO OPEN " + std::string(port) + "\n").c_str());
+        return false;
+    }
+
+    XPLMDebugString(("OPENED " + std::string(port) + "\n").c_str());
 
     DCB dcb = {};
     dcb.DCBlength = sizeof(DCB);
-    GetCommState(hSerial, &dcb);
+    GetCommState(h, &dcb);
 
     dcb.BaudRate = BAUD_RATE;
     dcb.ByteSize = 8;
     dcb.StopBits = ONESTOPBIT;
     dcb.Parity = NOPARITY;
 
-    SetCommState(hSerial, &dcb);
+    SetCommState(h, &dcb);
 
+    // 🔥 NON-BLOCKING SERIAL
     COMMTIMEOUTS t = {};
     t.ReadIntervalTimeout = MAXDWORD;
     t.ReadTotalTimeoutConstant = 0;
     t.ReadTotalTimeoutMultiplier = 0;
-    SetCommTimeouts(hSerial, &t);
+    SetCommTimeouts(h, &t);
 
     return true;
 }
 
-// -----------------------------------------------
-// FIND COMMANDS + DATAREFS
-// -----------------------------------------------
-static void initRefs() {
+// -------- INIT --------
+void initRefs() {
     static bool done = false;
     if (done) return;
 
-    // Commands
     S_up = XPLMFindCommand("toliss_airbus/lightcommands/StrobeLightUp");
     S_dn = XPLMFindCommand("toliss_airbus/lightcommands/StrobeLightDown");
 
@@ -115,7 +121,10 @@ static void initRefs() {
     R_on = XPLMFindCommand("toliss_airbus/lightcommands/TurnoffLightOn");
     R_off = XPLMFindCommand("toliss_airbus/lightcommands/TurnoffLightOff");
 
-    // DataRefs (anim)
+    cmd_warn = XPLMFindCommand("sim/annunciator/clear_master_warning");
+    cmd_caut = XPLMFindCommand("sim/annunciator/clear_master_caution");
+    cmd_chrono = XPLMFindCommand("AirbusFBW/CaptChronoButton");
+
     dr_strobe = XPLMFindDataRef("ckpt/oh/strobeLight/anim");
     dr_nav = XPLMFindDataRef("ckpt/oh/navLight/anim");
     dr_LL = XPLMFindDataRef("ckpt/oh/ladningLightLeft/anim");
@@ -123,118 +132,151 @@ static void initRefs() {
     dr_nose = XPLMFindDataRef("ckpt/oh/taxiLight/anim");
     dr_beacon = XPLMFindDataRef("ckpt/oh/beaconLight/anim");
     dr_wing = XPLMFindDataRef("ckpt/oh/wingLight/anim");
+    dr_rwy = XPLMFindDataRef("ckpt/oh/rwyTurnOff/anim");
+
+    dr_warn = XPLMFindDataRef("AirbusFBW/MasterWarn");
+    dr_caut = XPLMFindDataRef("AirbusFBW/MasterCaut");
 
     done = true;
 }
 
-// -----------------------------------------------
-// PARSE SERIAL → SET TARGETS
-// -----------------------------------------------
-static void handleCommand(const std::string& line) {
+// -------- SERIAL READ --------
+void readSerial(HANDLE h, std::string& buffer, void(*handler)(const std::string&)) {
 
-    if (line.size() < 3) return;
+    if (h == INVALID_HANDLE_VALUE) return;
+
+    char buf[128];
+    DWORD bytesRead = 0;
+
+    if (!ReadFile(h, buf, sizeof(buf) - 1, &bytesRead, NULL)) return;
+    if (bytesRead == 0) return;
+
+    buf[bytesRead] = '\0';
+    buffer += buf;
+
+    size_t pos;
+    while ((pos = buffer.find('\n')) != std::string::npos) {
+
+        std::string line = buffer.substr(0, pos);
+        buffer.erase(0, pos + 1);
+
+        while (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        handler(line);
+    }
+}
+
+// -------- HANDLERS --------
+void handleAlerts(const std::string& line) {
+    if (line == "W") XPLMCommandOnce(cmd_warn);
+    if (line == "C") XPLMCommandOnce(cmd_caut);
+    if (line == "T") XPLMCommandOnce(cmd_chrono);
+}
+
+void handleLights(const std::string& line) {
 
     if (line.rfind("LL:", 0) == 0) { tgtLL = atoi(line.substr(3).c_str()); return; }
     if (line.rfind("RL:", 0) == 0) { tgtRL = atoi(line.substr(3).c_str()); return; }
 
     char id = line[0];
-    int val = atoi(line.substr(2).c_str());
+    int v = atoi(line.substr(2).c_str());
 
-    switch (id) {
-    case 'S': tgtS = val; break;
-    case 'N': tgtN = val; break;
-    case 'O': tgtO = val; break;
-    case 'B': tgtB = val; break;
-    case 'W': tgtW = val; break;
-    case 'R': tgtR = val; break;
-    }
+    if (id == 'S') tgtS = v;
+    if (id == 'N') tgtN = v;
+    if (id == 'O') tgtO = v;
+    if (id == 'B') tgtB = v;
+    if (id == 'W') tgtW = v;
+    if (id == 'R') tgtR = v;
 }
 
-// -----------------------------------------------
-// CLOSED LOOP CONTROL
-// -----------------------------------------------
-void drive3Pos(int target, XPLMDataRef dr,
-    XPLMCommandRef up, XPLMCommandRef dn)
-{
-    if (target < 0 || !dr) return;
-
-    int current = XPLMGetDatai(dr);
-
-    if (current < target) XPLMCommandOnce(up);
-    else if (current > target) XPLMCommandOnce(dn);
+// -------- SEND LED --------
+void sendAlert(const std::string& msg) {
+    if (hAlerts == INVALID_HANDLE_VALUE) return;
+    DWORD w;
+    std::string m = msg + "\n";
+    WriteFile(hAlerts, m.c_str(), m.size(), &w, NULL);
 }
 
-void drive2Pos(int target, XPLMDataRef dr,
-    XPLMCommandRef on, XPLMCommandRef off)
-{
-    if (target < 0 || !dr) return;
+// -------- DRIVE --------
+void drive3(int tgt, XPLMDataRef dr, XPLMCommandRef up, XPLMCommandRef dn) {
+    if (tgt < 0 || !dr) return;
+    int cur = XPLMGetDatai(dr);
+    if (cur < tgt) XPLMCommandOnce(up);
+    else if (cur > tgt) XPLMCommandOnce(dn);
+}
 
-    int current = XPLMGetDatai(dr);
-
-    if (current != target) {
-        if (target == 1) XPLMCommandOnce(on);
+void drive2(int tgt, XPLMDataRef dr, XPLMCommandRef on, XPLMCommandRef off) {
+    if (tgt < 0 || !dr) return;
+    int cur = XPLMGetDatai(dr);
+    if (cur != tgt) {
+        if (tgt) XPLMCommandOnce(on);
         else XPLMCommandOnce(off);
     }
 }
 
-// -----------------------------------------------
-// FLIGHT LOOP
-// -----------------------------------------------
-static float loopFunc(float, float, int, void*) {
+// -------- LED --------
+static int lastWarn = -1, lastCaut = -1;
+
+void updateLEDs() {
+    if (!dr_warn || !dr_caut) return;
+
+    int w = XPLMGetDatai(dr_warn);
+    int c = XPLMGetDatai(dr_caut);
+
+    if (w != lastWarn) {
+        sendAlert(w ? "LED_WARN_ON" : "LED_WARN_OFF");
+        lastWarn = w;
+    }
+
+    if (c != lastCaut) {
+        sendAlert(c ? "LED_CAUT_ON" : "LED_CAUT_OFF");
+        lastCaut = c;
+    }
+}
+
+// -------- LOOP --------
+float loopFunc(float elapsed, float, int, void*) {
 
     initRefs();
 
-    if (hSerial == INVALID_HANDLE_VALUE) return 0.5f;
+    readSerial(hLights, bufLights, handleLights);
+    readSerial(hAlerts, bufAlerts, handleAlerts);
 
-    // ---- SERIAL READ ----
-    COMSTAT status;
-    DWORD errors;
-    ClearCommError(hSerial, &errors, &status);
+    commandTimer += elapsed;
 
-    if (status.cbInQue > 0) {
-        char buf[64];
-        DWORD read = 0;
+    cdS += elapsed; cdN += elapsed; cdLL += elapsed; cdRL += elapsed; cdO += elapsed;
+    cdB += elapsed; cdW += elapsed; cdR += elapsed;
 
-        if (ReadFile(hSerial, buf, sizeof(buf) - 1, &read, NULL) && read > 0) {
-            buf[read] = '\0';
-            serialBuffer += buf;
+    if (commandTimer > 0.12f) {
 
-            size_t pos;
-            while ((pos = serialBuffer.find('\n')) != std::string::npos) {
-                std::string line = serialBuffer.substr(0, pos);
-                serialBuffer.erase(0, pos + 1);
-                handleCommand(line);
-            }
-        }
+        if (cdS > 0.2f) { drive3(tgtS, dr_strobe, S_up, S_dn); cdS = 0; }
+        if (cdN > 0.2f) { drive3(tgtN, dr_nav, N_up, N_dn); cdN = 0; }
+        if (cdLL > 0.2f) { drive3(tgtLL, dr_LL, LL_up, LL_dn); cdLL = 0; }
+        if (cdRL > 0.2f) { drive3(tgtRL, dr_RL, RL_up, RL_dn); cdRL = 0; }
+        if (cdO > 0.2f) { drive3(tgtO, dr_nose, O_up, O_dn); cdO = 0; }
+
+        if (cdB > 0.2f) { drive2(tgtB, dr_beacon, B_on, B_off); cdB = 0; }
+        if (cdW > 0.2f) { drive2(tgtW, dr_wing, W_on, W_off); cdW = 0; }
+        if (cdR > 0.2f) { drive2(tgtR, dr_rwy, R_on, R_off); cdR = 0; }
+
+        updateLEDs();
+
+        commandTimer = 0.0f;
     }
-
-    // ---- DRIVE SYSTEM ----
-    drive3Pos(tgtS, dr_strobe, S_up, S_dn);
-    drive3Pos(tgtN, dr_nav, N_up, N_dn);
-    drive3Pos(tgtLL, dr_LL, LL_up, LL_dn);
-    drive3Pos(tgtRL, dr_RL, RL_up, RL_dn);
-    drive3Pos(tgtO, dr_nose, O_up, O_dn);
-
-    drive2Pos(tgtB, dr_beacon, B_on, B_off);
-    drive2Pos(tgtW, dr_wing, W_on, W_off);
-
-    // RWY (no dataref → direct)
-    if (tgtR == 1) XPLMCommandOnce(R_on);
-    else if (tgtR == 0) XPLMCommandOnce(R_off);
 
     return 0.05f;
 }
 
-// -----------------------------------------------
-// START / STOP
-// -----------------------------------------------
+// -------- START --------
 PLUGIN_API int XPluginStart(char* n, char* s, char* d) {
 
-    strcpy_s(n, 256, "ToLiss Light Panel");
-    strcpy_s(s, 256, "aryan.toliss.panel");
-    strcpy_s(d, 256, "Closed-loop Arduino lights");
+    strcpy_s(n, 256, "A320neo Panel");
+    strcpy_s(s, 256, "aryan.panel");
+    strcpy_s(d, 256, "Lights + Alerts");
 
-    if (!openSerial()) return 0;
+    if (!openSerial(hLights, PORT_LIGHTS)) return 0;
+    openSerial(hAlerts, PORT_ALERTS);
 
     XPLMCreateFlightLoop_t p = {};
     p.structSize = sizeof(p);
@@ -246,9 +288,11 @@ PLUGIN_API int XPluginStart(char* n, char* s, char* d) {
     return 1;
 }
 
+// -------- STOP --------
 PLUGIN_API void XPluginStop() {
     if (loopID) XPLMDestroyFlightLoop(loopID);
-    if (hSerial != INVALID_HANDLE_VALUE) CloseHandle(hSerial);
+    if (hLights != INVALID_HANDLE_VALUE) CloseHandle(hLights);
+    if (hAlerts != INVALID_HANDLE_VALUE) CloseHandle(hAlerts);
 }
 
 PLUGIN_API int XPluginEnable() { return 1; }
