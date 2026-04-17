@@ -139,6 +139,7 @@ docs/             # Documentation, diagrams, and images
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/alert_panel/image_3.jpeg" width="45%" />
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/alert_panel/image_4.jpeg" width="45%" />
 </p>
+
 ---
 
 ## 🚀 Future Plans
