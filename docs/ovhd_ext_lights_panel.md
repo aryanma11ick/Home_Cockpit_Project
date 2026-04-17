@@ -1,8 +1,37 @@
-# ✈️ Arduino → ToLiss A320Neo Overhead Light Panel
+# ✈️ Arduino → ToLiss A20Neo Overhead Light Panel
 
-A custom X-Plane plugin that connects a physical Arduino-based overhead panel to the ToLiss A320Neo aircraft using serial communication.
+A custom X-Plane plugin that connects a physical Arduino-based overhead panel to the ToLiss A333 aircraft using serial communication.
 
 This project enables real-world cockpit switches to control aircraft lighting systems with accurate, state-driven behavior.
+
+---
+
+## 🔗 Project Links
+
+### 💻 Plugin Source Code
+
+* https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/software/sim-interface/ovhd_ext_lights_panel/plugin.cpp
+
+### 🔌 Arduino Firmware
+
+* https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/firmware/arduino/ovhd_ext_lights_panel/ovhd_ext_lights.ino
+
+### 🖼️ Panel Images
+
+* https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_ext_lights_panel
+
+---
+
+## 📸 Hardware Preview
+
+> *(Add images below once uploaded in repo)*
+
+```md
+![Panel](docs/images/ovhd_ext_lights_panel/image_1.jpg)
+![Wiring](docs/images/ovhd_ext_lights_panel/image_2.jpg)
+![Panel](docs/images/ovhd_ext_lights_panel/image_3.jpg)
+![Wiring](docs/images/ovhd_ext_lights_panel/image_4.jpg)
+```
 
 ---
 
@@ -11,8 +40,8 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 ### 🔌 Hardware Integration
 
 * Arduino-based input system
-* Supports multi-switch overhead panels
-* Serial communication (115200 baud)
+* Multi-switch overhead panel support
+* Serial communication @ 115200 baud
 
 ---
 
@@ -35,10 +64,10 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 
 ### 🔁 Closed-Loop Control System
 
-* Reads aircraft state using ToLiss animation datarefs
-* Compares hardware position vs simulator state
-* Automatically drives switches using Up/Down commands
-* Prevents desynchronization between sim and hardware
+* Uses ToLiss animation datarefs for feedback
+* Compares hardware vs aircraft state
+* Automatically steps switches using Up/Down commands
+* Eliminates desynchronization
 
 ---
 
@@ -46,8 +75,8 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 
 * Non-blocking serial communication
 * Buffered input parsing
-* Minimal CPU usage
-* No FPS drops or sim freezes
+* Low CPU usage
+* No FPS drops / sim lag
 
 ---
 
@@ -58,13 +87,6 @@ Arduino → Serial → Plugin → Commands → Aircraft
                                 ↑
                           DataRefs (feedback)
 ```
-
-### Flow:
-
-1. Arduino sends switch position (e.g. `N:2`)
-2. Plugin parses input
-3. Plugin reads current aircraft state (DataRef)
-4. Plugin issues commands until states match
 
 ---
 
@@ -98,17 +120,13 @@ R:1
 
 ## 🧩 X-Plane Integration
 
-### Commands (ToLiss)
-
-Uses:
+### ✈️ Commands (Control)
 
 ```
 toliss_airbus/lightcommands/*
 ```
 
-### DataRefs (State Feedback)
-
-Uses animation refs:
+### 📊 DataRefs (State Feedback)
 
 ```
 ckpt/oh/.../anim
@@ -121,7 +139,7 @@ ckpt/oh/.../anim
 ### 1. Build Plugin
 
 * Open project in Visual Studio
-* Build as **64-bit DLL**
+* Build as **64-bit**
 * Rename output:
 
 ```
@@ -132,34 +150,32 @@ win.xpl
 
 ### 2. Install Plugin
 
-Place in:
-
 ```
-X-Plane 12/Resources/plugins/YourPluginName/64/win.xpl
+X-Plane 12/Resources/plugins/ArduinoSerialPlugin/64/win.xpl
 ```
 
 ---
 
 ### 3. Arduino Setup
 
-* Upload Arduino code
-* Set baud rate to **115200**
-* Ensure correct COM port in plugin
+* Upload firmware
+* Set baud rate: **115200**
+* Match COM port in plugin
 
 ---
 
-### 4. Run X-Plane
+### 4. Run
 
-* Load ToLiss A333
+* Load ToLiss A320Neo
 * Enable plugin via Plugin Admin
 
 ---
 
 ## ⚠️ Notes
 
-* RWY Turn-Off uses direct commands (no feedback dataref)
-* First-time sync depends on aircraft state
-* Requires ToLiss A333 (not compatible with Laminar A333)
+* RWY Turn-Off uses command-only (no dataref feedback)
+* Requires ToLiss aircraft (not Laminar compatible)
+* Initial state sync handled via animation datarefs
 
 ---
 
@@ -167,14 +183,14 @@ X-Plane 12/Resources/plugins/YourPluginName/64/win.xpl
 
 * LED feedback to Arduino
 * Auto serial reconnect
-* Power state logic (cold & dark)
-* Full overhead panel expansion
+* Cold & Dark power logic
+* Full overhead expansion
 
 ---
 
 ## 👨‍💻 Author
 
 Aryan Mallick
-Custom home cockpit + avionics integration project
+Home cockpit & avionics integration project
 
 ---
