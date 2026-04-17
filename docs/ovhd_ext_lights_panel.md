@@ -29,15 +29,11 @@ https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_
 
 ## 📸 Hardware Preview
 
-<p float="left">
-  <img src="docs/images/ovhd_ext_lights_panel/image_1.jpeg" width="45%" />
-  <img src="docs/images/ovhd_ext_lights_panel/image_2.jpeg" width="45%" />
-</p>
-
-<p float="left">
-  <img src="docs/images/ovhd_ext_lights_panel/image_3.jpeg" width="45%" />
-  <img src="docs/images/ovhd_ext_lights_panel/image_4.jpeg" width="45%" />
-</p>
+## 📸 Hardware Preview
+![Panel](docs/images/ovhd_ext_lights_panel/image_1.jpeg)
+![Panel](docs/images/ovhd_ext_lights_panel/image_2.jpeg)
+![Wiring](docs/images/ovhd_ext_lights_panel/image_3.jpeg)
+![Wiring](docs/images/ovhd_ext_lights_panel/image_4.jpeg)
 
 ---
 
