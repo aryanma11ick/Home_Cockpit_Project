@@ -1,8 +1,13 @@
-# ✈️ Arduino → ToLiss A20Neo Overhead Light Panel
+# ✈️ Arduino → ToLiss A320neo Overhead Light Panel
 
-A custom X-Plane plugin that connects a physical Arduino-based overhead panel to the ToLiss A333 aircraft using serial communication.
+![Status](https://img.shields.io/badge/Status-Active-green)
+![Platform](https://img.shields.io/badge/X--Plane-12-blue)
+![Aircraft](https://img.shields.io/badge/Aircraft-A320neo-blue)
+![Hardware](https://img.shields.io/badge/Arduino-Compatible-orange)
 
-This project enables real-world cockpit switches to control aircraft lighting systems with accurate, state-driven behavior.
+A custom X-Plane plugin that connects a physical Arduino-based overhead panel to the ToLiss A320neo using serial communication.
+
+This project enables real-world cockpit switches to control aircraft lighting systems with accurate, state-driven behavior using a closed-loop control system.
 
 ---
 
@@ -10,32 +15,29 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 
 ### 💻 Plugin Source Code
 
-* https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/software/sim-interface/ovhd_ext_lights_panel/plugin.cpp
+https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/software/sim-interface/ovhd_ext_lights_panel/plugin.cpp
 
 ### 🔌 Arduino Firmware
 
-* https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/firmware/arduino/ovhd_ext_lights_panel/ovhd_ext_lights.ino
+https://github.com/aryanma11ick/Home_Cockpit_Project/blob/main/firmware/arduino/ovhd_ext_lights_panel/ovhd_ext_lights.ino
 
 ### 🖼️ Panel Images
 
-* https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_ext_lights_panel
+https://github.com/aryanma11ick/Home_Cockpit_Project/tree/main/docs/images/ovhd_ext_lights_panel
 
 ---
 
 ## 📸 Hardware Preview
 
-> *(Add images below once uploaded in repo)*
+<p float="left">
+  <img src="docs/images/ovhd_ext_lights_panel/image_1.jpg" width="45%" />
+  <img src="docs/images/ovhd_ext_lights_panel/image_2.jpg" width="45%" />
+</p>
 
-```md
-![Panel](docs/images/ovhd_ext_lights_panel/image_1.jpg)
-![Wiring](docs/images/ovhd_ext_lights_panel/image_1.jpg)
-![Panel](docs/images/ovhd_ext_lights_panel/image_2.jpg)
-![Wiring](docs/images/ovhd_ext_lights_panel/image_2.jpg)
-![Panel](docs/images/ovhd_ext_lights_panel/image_3.jpg)
-![Wiring](docs/images/ovhd_ext_lights_panel/image_3.jpg)
-![Panel](docs/images/ovhd_ext_lights_panel/image_4.jpg)
-![Wiring](docs/images/ovhd_ext_lights_panel/image_4.jpg)
-```
+<p float="left">
+  <img src="docs/images/ovhd_ext_lights_panel/image_3.jpg" width="45%" />
+  <img src="docs/images/ovhd_ext_lights_panel/image_4.jpg" width="45%" />
+</p>
 
 ---
 
@@ -43,8 +45,8 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 
 ### 🔌 Hardware Integration
 
-* Arduino-based input system
-* Multi-switch overhead panel support
+* Arduino-based overhead panel
+* Multiple switch inputs (3-position & 2-position)
 * Serial communication @ 115200 baud
 
 ---
@@ -68,10 +70,10 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 
 ### 🔁 Closed-Loop Control System
 
-* Uses ToLiss animation datarefs for feedback
-* Compares hardware vs aircraft state
-* Automatically steps switches using Up/Down commands
-* Eliminates desynchronization
+* Uses ToLiss animation datarefs for real-time feedback
+* Compares hardware state with aircraft state
+* Automatically drives switches using Up/Down commands
+* Prevents desynchronization between sim and hardware
 
 ---
 
@@ -80,7 +82,7 @@ This project enables real-world cockpit switches to control aircraft lighting sy
 * Non-blocking serial communication
 * Buffered input parsing
 * Low CPU usage
-* No FPS drops / sim lag
+* No FPS drops or simulator lag
 
 ---
 
@@ -107,7 +109,7 @@ Arduino → Serial → Plugin → Commands → Aircraft
 | W    | Wing          | 0 / 1     |
 | R    | RWY Turn Off  | 0 / 1     |
 
-Example:
+### Example
 
 ```
 S:2
@@ -170,25 +172,25 @@ X-Plane 12/Resources/plugins/ArduinoSerialPlugin/64/win.xpl
 
 ### 4. Run
 
-* Load ToLiss A320Neo
+* Load ToLiss A320neo
 * Enable plugin via Plugin Admin
 
 ---
 
 ## ⚠️ Notes
 
-* RWY Turn-Off uses command-only (no dataref feedback)
-* Requires ToLiss aircraft (not Laminar compatible)
-* Initial state sync handled via animation datarefs
+* RWY Turn-Off uses command-only logic (no feedback dataref)
+* Designed specifically for ToLiss Airbus aircraft
+* Initial alignment handled via dataref-based feedback loop
 
 ---
 
 ## 🔧 Future Improvements
 
-* LED feedback to Arduino
+* LED feedback to Arduino (panel lighting sync)
 * Auto serial reconnect
-* Cold & Dark power logic
-* Full overhead expansion
+* Cold & Dark / power state logic
+* Expansion to full overhead panel
 
 ---
 
@@ -198,3 +200,7 @@ Aryan Mallick
 Home cockpit & avionics integration project
 
 ---
+
+## 📜 License
+
+MIT License (recommended)
