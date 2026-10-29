@@ -121,6 +121,11 @@ docs/             # Documentation, diagrams, and images
 ### Hardware Preview
 
 <p align="center">
+  <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_6.jpeg" width="45%" />
+  <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_6.jpeg" width="45%" />
+</p>
+
+<p align="center">
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_1.jpeg" width="45%" />
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_2.jpeg" width="45%" />
 </p>
@@ -129,6 +134,8 @@ docs/             # Documentation, diagrams, and images
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_3.jpeg" width="45%" />
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/ovhd_ext_lights_panel/image_4.jpeg" width="45%" />
 </p>
+
+
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/alert_panel/image_1.jpeg" width="45%" />
@@ -139,6 +146,7 @@ docs/             # Documentation, diagrams, and images
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/alert_panel/image_3.jpeg" width="45%" />
   <img src="https://raw.githubusercontent.com/aryanma11ick/Home_Cockpit_Project/main/docs/images/alert_panel/image_4.jpeg" width="45%" />
 </p>
+
 
 ---
 
